@@ -87,12 +87,50 @@
 # 注意:由于加载/恢复指令只接受通用寄存器，CSRs(mscratch)不能用作'基'。
 
 .text
+
+# 中断和异常在machine模式下来到这里。
+.globl	trap_vector
+#  trap vector基址必须始终在4字节边界上对齐
+.align 4
+trap_vector:
+
+# mscratch的意义是 保存当前在 hart 上运行的 task 的上下文（context）的地址。
+# 补充：临时寄存器，清零没有用。对于临时寄存器坚持“先赋值再使用”的原则 ！！！！
+	# 保存trap前任务的寄存器上下文
+	csrrw	t6,mscratch,t6	# 交换	t6,mscratch
+	reg_save t6				# 把trap前任务的寄存器上下文保存到 mscratch中的地址
+
+	# 再单独保存的t6寄存器
+	mv t5,t6				# t5 指向 当前上下文
+	csrr	t6,mscratch		# 读 mscratch的值到 t6
+	sw	t6,120(t5)			# 以t5为基+120的地址上保存t6的值，
+
+	# 恢复 trap任务的上下文
+		csrw 	mscratch,t5 # 把mscratch的值再从t5中拿回来
+
+	# 调用trap. C中的trap处理程序
+	csrr	a0,mepc
+	csrr	a1,mcause
+	call 	trap_handler	# 相对于 trap_handler(mempc,mcause)
+
+	# Trap_handler将通过a0返回返回地址。
+	csrw	mepc,a0
+
+	# trap已经处理完了，恢复trap前的任务上下文
+	csrr	t6,mscratch
+	reg_restore t6
+
+	# 回到我们在trap之前做的事情。
+	mret 	# mret 指令，会将 mepc 中的值恢复到 pc 中（实现返回的效果）
+
+
+
 # void switch_to(struct context *next);
 # a0:指向下一个任务上下文的指针
 .globl switch_to        # 定义程序的入口标签 switch_to
 .align 4                # 将当前PC地址推进到2的4次方字节对齐的位置
 
-switch_to:
+switch_to:	# 补充：临时寄存器，清零没有用。对于临时寄存器坚持“先赋值再使用”的原则 ！！！！
     csrrw   t6,mscratch,t6  # 交换 t6 和 mscratch里的值
     beqz    t6,1f           # t6等于0时，转跳1标签(系统刚启动时，t6=0)
 
