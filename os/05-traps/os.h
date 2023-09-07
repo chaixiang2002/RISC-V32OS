@@ -12,7 +12,6 @@
 // uart
 extern int uart_putc(char ch);
 extern void uart_puts(char *s);
-extern int uart_getc(void);
 
 // printf
 extern int printf(const char* s,...);// 什么高级用法? printf() 函数也支持变长参数列表，可以使用省略号 ... 来表示，用于指定要输出的多个值。
@@ -63,9 +62,5 @@ extern int task_create(void (*task)(void));
 extern void task_delay(volatile int count);//任务延迟count 豪秒
 extern void task_yield();//
 
-
-// plic外部中断
-extern int plic_claim(void);
-extern void plic_complete(int irq);
 
 #endif

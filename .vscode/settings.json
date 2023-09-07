@@ -1,6 +1,7 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "riscv.h": "c"
+        "riscv.h": "c",
+        "os.h": "c"
     }
 }

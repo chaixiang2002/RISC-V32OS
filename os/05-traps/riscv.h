@@ -7,7 +7,7 @@
  */
 
 
-// 获得tp寄存器的值并返回	tp寄存器放的时系统启动的hartid
+// 获得tp寄存器的值并返回
 static inline reg_t r_tp()
 {
 	reg_t x;

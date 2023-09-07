@@ -9,7 +9,7 @@ void user_task0(void)
     {
         printf("Task 0: Running...\n");
 
-        // trap_test();// 异常测试
+        trap_test();// 异常测试
 
         task_delay(DELAY);
         task_yield();// 切换任务

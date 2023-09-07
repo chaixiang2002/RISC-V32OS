@@ -1,8 +1,5 @@
 #include   "os.h"
 
-// file:///C:/SnowChar/AutumnRecruitment/OS/RISC-V/riscv-operating-system-mooc/refs/td16550.pdf  -----------------------------------------------
-
-
 // 这里是定义了一个宏，作用是：根据偏移量，获得某个UART寄存器的指针
 // UART0是UART的物理地址，reg是偏移量，
 // (volatile uint8_t *)是  强制转成uint8_t 类型指针uint8_t 类型
@@ -48,11 +45,11 @@
 
 /**
  * LINE STATUS REGISTER (LSR寄存器)
- * 该寄存器的 第0位     LSR_RX_READY
+ * 该寄存器的 第0位
  * 为0时，  代表 在接收保持寄存器或FIFO中没有数据。
  * 为1时，  代表 数据已被接收并保存在接收保持寄存器或FIFO中。
  * 
- * 该寄存器的 第5位     LSR_TX_IDLE
+ * 该寄存器的 第5位
  * 为0时，  代表 发送保持寄存器已满。16550将不接受任何传输数据。
  * 为1时，  代表 发送器保持寄存器(或FIFO)为空。CPU可以加载下一个字符。
 */
@@ -63,6 +60,7 @@
 #define uart_write_reg(reg,v) (*(UART_REG(reg)) = (v))  // 向某个寄存器 写入 v
 
 
+// file:///C:/SnowChar/AutumnRecruitment/OS/RISC-V/riscv-operating-system-mooc/refs/td16550.pdf  -----------------------------------------------
 void uart_init()
 {
     uart_write_reg(IER,0x00);    // 在IER写入0 ，关闭中断， 因为冲突？？？？？？
@@ -104,10 +102,6 @@ void uart_init()
    // 通过这个位可以选择奇偶校验或不奇偶校验。
     //    0没有
     // 1奇偶校验在发送时产生，在接收时校验。
-
-    // 开启中断！！！！！！！
-	uint8_t ier = uart_read_reg(IER);
-	uart_write_reg(IER, ier | (1 << 0));
     
 }
 
@@ -132,35 +126,6 @@ void uart_puts(char *s){
     }
     
 }
-
-//读LSR寄存器第5位，为1时， 代表 数据已被接收并保存在接收保持寄存器或FIFO中。
-int uart_getc(void)
-{
-	if (uart_read_reg(LSR) & LSR_RX_READY){
-		return uart_read_reg(RHR);
-	} else {
-		return -1;
-	}
-}
-
-/*
-    处理一个uart中断，因为输入已经接受而触发发，从trap.c调用。
-*/
-void uart_isr(void)
-{
-	while (1) {
-		int c = uart_getc();
-		if (c == -1) {
-			break;
-		} else {
-			uart_putc((char)c);
-			uart_putc('\n');
-		}
-	}
-}
-
-
-
 
 
 

@@ -7,7 +7,6 @@ extern void schedule(void);
 extern void os_main(void);
 // extern void uart_puts(char *s); 被封装到printf（）
 extern void trap_init(void);
-extern void plic_init(void);
 
 void start_kernel(void)
 {
@@ -16,9 +15,7 @@ void start_kernel(void)
 
     page_init();    // 内存页的初始化
 
-    trap_init();    // trap初始化
-
-    plic_init();    // plic设备初始化
+    trap_init();
 
     sched_init();// 任务调度初始化
 
