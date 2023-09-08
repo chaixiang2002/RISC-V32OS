@@ -105,8 +105,12 @@ trap_vector:
 	csrr	t6,mscratch		# 读 mscratch的值到 t6
 	sw	t6,120(t5)			# 以t5为基+120的地址上保存t6的值，
 
+	# 再单独把mepc寄存器保存		，将mepc保存到当前任务的上下文
+	csrr	a0, mepc
+	sw	a0, 124(t5)
+
 	# 恢复 trap任务的上下文
-		csrw 	mscratch,t5 # 把mscratch的值再从t5中拿回来
+	csrw 	mscratch,t5 # 把mscratch的值再从t5中拿回来
 
 	# 调用trap. C中的trap处理程序
 	csrr	a0,mepc
@@ -131,28 +135,46 @@ trap_vector:
 .align 4                # 将当前PC地址推进到2的4次方字节对齐的位置
 
 switch_to:	# 补充：临时寄存器，清零没有用。对于临时寄存器坚持“先赋值再使用”的原则 ！！！！
-    csrrw   t6,mscratch,t6  # 交换 t6 和 mscratch里的值
-    beqz    t6,1f           # t6等于0时，转跳1标签(系统刚启动时，t6=0)
+	# 切换mscratch以指向下一个任务的上下文
+	csrw	mscratch,	a0
+	# 设置mepc为下一个任务所在的PC
+	lw	a1,124(a0)
+	csrw	mepc,a1
 
-    reg_save t6             # 保存上一个任务的上下文
+	# 恢复所有通用寄存器
+	# 用t6指向下一个任务的上下文
+	mv	t6,a0
+	reg_restore t6
 
-    # 保存实际的t6寄存器，我们将其交换到mscratch中
-    mv t5,t6                # t5 指向当前任务的上下文
-    csrr    t6,mscratch     # csrr，读取一个 CSR 的值到通用寄存器。如：csrr t0, mstatus，读取 mstatus 的值到 t0 中
-    sw t6,120(t5)           # 保存t6，以t5为base
+	# 真正做上下文切换的地方
+	# 注意 mret会开启全局中断????
+	mret
 
 
-1:
-    # 切换 mscratch 去 指向下一个任务的上下文
-    csrw    mscratch,a0 # 把a0给mscratch，a0 装的是 想要跳转任务的上下文的地址
+
+
+#     csrrw   t6,mscratch,t6  # 交换 t6 和 mscratch里的值
+#     beqz    t6,1f           # t6等于0时，转跳1标签(系统刚启动时，t6=0)
+
+#     reg_save t6             # 保存上一个任务的上下文
+
+#     # 保存实际的t6寄存器，我们将其交换到mscratch中
+#     mv t5,t6                # t5 指向当前任务的上下文
+#     csrr    t6,mscratch     # csrr，读取一个 CSR 的值到通用寄存器。如：csrr t0, mstatus，读取 mstatus 的值到 t0 中
+#     sw t6,120(t5)           # 保存t6，以t5为base
+
+
+# 1:
+#     # 切换 mscratch 去 指向下一个任务的上下文
+#     csrw    mscratch,a0 # 把a0给mscratch，a0 装的是 想要跳转任务的上下文的地址
  
-    # 恢复所有通用寄存器
-    # 使用t6指向新任务的上下文
-    mv t6,a0        # a0 装的是 想要跳转任务的上下文的地址
-    reg_restore t6  # 恢复 想要跳转任务的上下文
+#     # 恢复所有通用寄存器
+#     # 使用t6指向新任务的上下文
+#     mv t6,a0        # a0 装的是 想要跳转任务的上下文的地址
+#     reg_restore t6  # 恢复 想要跳转任务的上下文
 
-    # Do actual context switching.
-	ret			    # ret时，pc寄存器 会设置为 ra寄存器存的地址
+#     # Do actual context switching.
+# 	ret			    # ret时，pc寄存器 会设置为 ra寄存器存的地址
 
 
 .end

@@ -121,16 +121,11 @@ int uart_putc(char ch){
     return uart_write_reg(THR,ch);
 }
 
-void uart_puts(char *s){
-    while (*s)
-    {
-        while (*s)
-        {
-            uart_putc(*s++);
-        }
-        
-    }
-    
+void uart_puts(char *s)
+{
+	while (*s) {
+		uart_putc(*s++);
+	}
 }
 
 //读LSR寄存器第5位，为1时， 代表 数据已被接收并保存在接收保持寄存器或FIFO中。

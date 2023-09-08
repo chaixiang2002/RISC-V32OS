@@ -3,6 +3,7 @@
 extern void trap_vector(void);
 extern void uart_isr(void);
 extern void timer_handler(void);
+extern void schedule(void);
 
 // 把 trap处理函数（trap_handler()）的地址 写入 mtvec寄存器 
 void trap_init()
@@ -35,6 +36,15 @@ reg_t trap_handler(reg_t epc, reg_t cause)
 		switch (cause_code) {
 		case 3:
 			uart_puts("software interruption!\n");
+			/*
+			*通过清除确认软件中断
+			* mip中的MSIP位。
+			*/
+			int id = r_mhartid();
+    		*(uint32_t*)CLINT_MSIP(id) = 0;
+
+			schedule();
+
 			break;
 		case 7:
 			uart_puts("timer interruption!\n");

@@ -4,28 +4,23 @@
 
 void user_task0(void)
 {
-    printf("Task 0: Created!\n");
-    while (1)
-    {
-        printf("Task 0: Running...\n");
+	uart_puts("Task 0: Created!\n");
 
-        // trap_test();// 异常测试
-
-        task_delay(DELAY);
-        task_yield();// 切换任务
-    }
+	task_yield();
+	uart_puts("Task 0: I'm back!\n");
+	while (1) {
+		uart_puts("Task 0: Running...\n");
+		task_delay(DELAY);
+	}
 }
 
 void user_task1(void)
 {
-    printf("Task 1: Created!\n");
-    while (1)
-    {
-        printf("Task 1: Running...\n");
+	uart_puts("Task 1: Created!\n");
+	while (1) {
+		uart_puts("Task 1: Running...\n");
 		task_delay(DELAY);
-		task_yield();
-    }
-    
+	}
 }
 
 

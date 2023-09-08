@@ -31,6 +31,17 @@ _start:
     la sp,stacks + STACK_SIZE       # 请问这是申请了 1024*8 +1024 栈的内存吗？？？？？？？？？？？？？？？？
     add sp,sp,t0    
                     # 1024*8 +1024 再加上0吗？？？？？？？？？？？？？？？？？？？？？？？？？？？？
+    
+    # 在start_kernel结束时，schedule()将调用MRET进行切换
+    # 到第一个任务，所以我们在这里准备状态。
+    # 注意:默认mstatus为0
+    # 设置mstatus。MPP到3，所以在MRET之后我们仍然在Machine模式下运行。
+    # 设置mstatus。MPIE为1，因此MRET将启用中断。
+	li	t0, 3 << 11 | 1 << 7
+	csrr	a1, mstatus
+	or	t0, t0, a1
+	csrw	mstatus, t0
+    
     j   start_kernel
 
 

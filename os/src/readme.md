@@ -3,28 +3,29 @@ start.S->mem.S->entry.S->
 kernel.c->uart.c->printf.c->page.c->sched.c->user.c->trap.c->plic.c->timer.c
 
 新增
-1. timer.c      -定义硬件定时器的相关函数
-
-
 
 
 更新情况
-1. kernel.c     -多了timer的初始化
-2. trap.c       -多了timer_handle()
-4. platfrom.h   -多了CLINT相关的宏
+1. start.S      改动？？
+2. entry.S      更改trap_vector，switch_to的逻辑
+3. os.h         context结构里多了pc
+4. sched.c      开启软件中断和触发一个软件中断
+5. user.c       小改逻辑
+6. trap.c       多了软件中断时的处理函数
+7. plic.c       少了 开启Machine模式全局中断 的代码？？？为什么？
+8. timer.c      少了 开启Machine模式全局中断 的代码？？？为什么？ 多了软件中断时的处理函数
 
 
 无改动
-1. start.S
-2. mem.S
-3. entry.S
-4. printf.c
-5. page.c
-6. sched.c
-7. user.c       
-8. riscv.h
-9. types.h
-10. os.ld
+1. mem.S   
+2. platform.h   
+3. riscv.h 
+4. types.h
+5. kernel.c
+6. uart.c
+
+7. printf.c
+8. page.c
 
 
 <!-- 一个任务的创建与切换时这样的

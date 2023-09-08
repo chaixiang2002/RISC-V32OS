@@ -6,7 +6,7 @@ extern void uart_puts(char *s);
 void start_kernel(void)
 {
     uart_init();
-    uart_puts("hello,SNowOS!\n");
+    uart_puts("hello,SNowOS!asdasdasdasdsa\n");
 
     while (1)
     {    

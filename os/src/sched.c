@@ -26,6 +26,9 @@ static int _current =-1;
 void sched_init()
 {
     w_mscratch(0);//任务切换初始化时 ,写入0到mscratch寄存器
+    
+    /* 开启 machine-mode 软件中断  */
+	w_mie(r_mie() | MIE_MSIE);
 }
 
 /*
@@ -35,7 +38,8 @@ void sched_init()
 void schedule()
 {
     if(_top<=0){
-        panic("error：任务号 小于等于 0！！");
+        panic("Num of task should be greater than zero");
+        return;
     }
 
     _current=(_current+1)%_top;
@@ -85,7 +89,10 @@ int task_create(void (*start_routin)(void))
 *任务开始运行。
 */
 void task_yield(){
-    schedule();
+    // schedule();
+    // 手动触发一个软件中断
+	int id = r_mhartid();
+	*(uint32_t*)CLINT_MSIP(id) = 1;
 }
 
 /*
