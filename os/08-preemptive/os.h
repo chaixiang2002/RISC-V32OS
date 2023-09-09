@@ -71,16 +71,4 @@ extern void task_yield();//
 extern int plic_claim(void);
 extern void plic_complete(int irq);
 
-/* 锁 */
-extern int spin_lock(void);
-extern int spin_unlock(void);
-
-struct spinlock
-{
-    int locked;
-};
-extern void initlock(struct spinlock *lk);
-extern void _spin_lock(struct spinlock *lk);
-extern void _spin_unlock(struct spinlock *lk);
-
 #endif
