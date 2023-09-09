@@ -37,14 +37,14 @@ void sched_init()
 
 void schedule()
 {
-    if(_top<=0){
-        panic("Num of task should be greater than zero");
-        return;
-    }
+	if (_top <= 0) {
+		panic("Num of task should be greater than zero!");
+		return;
+	}
 
-    _current=(_current+1)%_top;
-    struct context *next= &(ctx_tasks[_current]); // next是上下文类型指针 ，指向当前任务的上下文
-    switch_to(next);
+	_current = (_current + 1) % _top;
+	struct context *next = &(ctx_tasks[_current]);
+	switch_to(next);
 }
 
 // 通过id切换任务
@@ -76,7 +76,8 @@ int task_create(void (*start_routin)(void))
 {
 	if (_top < MAX_TASKS) {
 		ctx_tasks[_top].sp = (reg_t) &task_stack[_top][STACK_SIZE];	//在当前的任务上下文数组，初始化一个新任务栈，
-		ctx_tasks[_top].ra = (reg_t) start_routin;	//start_routin是一个函数指针
+		// ctx_tasks[_top].ra = (reg_t) start_routin;	//start_routin是一个函数指针		  已废弃！！	协作式时switch_to是通过ret指令，是把ra寄存器的值赋给pc
+		ctx_tasks[_top].pc = (reg_t) start_routin;	//start_routin是一个函数指针	--------------！！！	抢占式时switch_to是通过mret指令，是把mpc寄存器的值赋给pc
 		_top++;
 		return 0;
 	} else {

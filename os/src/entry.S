@@ -93,10 +93,10 @@
 #  trap vector基址必须始终在4字节边界上对齐
 .align 4
 trap_vector:
-
-# mscratch的意义是 保存当前在 hart 上运行的 task 的上下文（context）的地址。
 # 补充：临时寄存器，清零没有用。对于临时寄存器坚持“先赋值再使用”的原则 ！！！！
-	# 保存trap前任务的寄存器上下文
+# mepc		装的是某个任务具体到哪指令的地址
+# mscratch	装的是某个任务上下文的基地址
+	# 保存trap前任务的上下文
 	csrrw	t6,mscratch,t6	# 交换	t6,mscratch
 	reg_save t6				# 把trap前任务的寄存器上下文保存到 mscratch中的地址
 
@@ -109,6 +109,8 @@ trap_vector:
 	csrr	a0, mepc
 	sw	a0, 124(t5)
 
+
+	# -------------------------------------------------------------
 	# 恢复 trap任务的上下文
 	csrw 	mscratch,t5 # 把mscratch的值再从t5中拿回来
 
@@ -117,6 +119,7 @@ trap_vector:
 	csrr	a1,mcause
 	call 	trap_handler	# 相对于 trap_handler(mempc,mcause)
 
+	# ------------------------------------------------------------
 	# Trap_handler将通过a0返回返回地址。
 	csrw	mepc,a0
 
@@ -135,10 +138,10 @@ trap_vector:
 .align 4                # 将当前PC地址推进到2的4次方字节对齐的位置
 
 switch_to:	# 补充：临时寄存器，清零没有用。对于临时寄存器坚持“先赋值再使用”的原则 ！！！！
-	# 切换mscratch以指向下一个任务的上下文
+	# 切换mscratch以指向下一个任务的上下文的基地址
 	csrw	mscratch,	a0
 	# 设置mepc为下一个任务所在的PC
-	lw	a1,124(a0)
+	lw	a1,124(a0)		# 根据基地址把该任务的pc取出到a1
 	csrw	mepc,a1
 
 	# 恢复所有通用寄存器
@@ -148,33 +151,9 @@ switch_to:	# 补充：临时寄存器，清零没有用。对于临时寄存器�
 
 	# 真正做上下文切换的地方
 	# 注意 mret会开启全局中断????
-	mret
+	# ret			    # ret时，pc寄存器 会设置为 ra寄存器存的地址
+	mret 				# mret 将 PC 设置为 mepc的值
 
-
-
-
-#     csrrw   t6,mscratch,t6  # 交换 t6 和 mscratch里的值
-#     beqz    t6,1f           # t6等于0时，转跳1标签(系统刚启动时，t6=0)
-
-#     reg_save t6             # 保存上一个任务的上下文
-
-#     # 保存实际的t6寄存器，我们将其交换到mscratch中
-#     mv t5,t6                # t5 指向当前任务的上下文
-#     csrr    t6,mscratch     # csrr，读取一个 CSR 的值到通用寄存器。如：csrr t0, mstatus，读取 mstatus 的值到 t0 中
-#     sw t6,120(t5)           # 保存t6，以t5为base
-
-
-# 1:
-#     # 切换 mscratch 去 指向下一个任务的上下文
-#     csrw    mscratch,a0 # 把a0给mscratch，a0 装的是 想要跳转任务的上下文的地址
- 
-#     # 恢复所有通用寄存器
-#     # 使用t6指向新任务的上下文
-#     mv t6,a0        # a0 装的是 想要跳转任务的上下文的地址
-#     reg_restore t6  # 恢复 想要跳转任务的上下文
-
-#     # Do actual context switching.
-# 	ret			    # ret时，pc寄存器 会设置为 ra寄存器存的地址
 
 
 .end

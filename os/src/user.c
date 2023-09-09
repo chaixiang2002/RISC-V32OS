@@ -6,7 +6,7 @@ void user_task0(void)
 {
 	uart_puts("Task 0: Created!\n");
 
-	task_yield();
+	// task_yield();
 	uart_puts("Task 0: I'm back!\n");
 	while (1) {
 		uart_puts("Task 0: Running...\n");
