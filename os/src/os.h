@@ -83,4 +83,15 @@ extern void initlock(struct spinlock *lk);
 extern void _spin_lock(struct spinlock *lk);
 extern void _spin_unlock(struct spinlock *lk);
 
+
+// 软件定时器
+struct timer {
+	void (*func)(void *arg);		// 执行函数的入口地址，			执行函数需要用户自己定义，是一个函数指针
+	void *arg;						// 执行函数参数的指针， 		最终这个参数将传入 上面的执行函数里
+	uint32_t timeout_tick;			// 超时计数器
+};
+extern struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
+extern void timer_delete(struct timer *timer);
+
+
 #endif
