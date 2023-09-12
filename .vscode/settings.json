@@ -2,6 +2,7 @@
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
         "riscv.h": "c",
-        "os.h": "c"
+        "os.h": "c",
+        "syscall.h": "c"
     }
 }

@@ -4,6 +4,7 @@ extern void trap_vector(void);
 extern void uart_isr(void);
 extern void timer_handler(void);
 extern void schedule(void);
+extern void do_syscall(struct context *cxt);
 
 // 把 trap处理函数（trap_handler()）的地址 写入 mtvec寄存器 
 void trap_init()
@@ -26,13 +27,13 @@ void external_interrupt_handler()
 	}
 }
 
-reg_t trap_handler(reg_t epc, reg_t cause)
+reg_t trap_handler(reg_t epc, reg_t cause,struct context *cxt)
 {
 	reg_t return_pc = epc;   // epc记录着 trap前pc值
 	reg_t cause_code = cause & 0xfff; //获得trap码
 	
 	if (cause & 0x80000000) {
-		/* Asynchronous trap - interrupt */
+		/* Asynchronous trap - 中断 */
 		switch (cause_code) {
 		case 3:
 			uart_puts("software interruption!\n");
@@ -59,10 +60,21 @@ reg_t trap_handler(reg_t epc, reg_t cause)
 			break;
 		}
 	} else {
-		/* Synchronous trap - exception */
+		/* Synchronous trap - 异常 */
 		printf("Sync exceptions!, code = %d\n", cause_code);
-		panic("OOPS! What can I do!");
-		//return_pc += 4;
+		switch (cause_code)
+		{
+			case 8:
+				printf("System call from U-mode\n");
+				do_syscall(cxt);
+				return_pc+=4;
+				break;
+			
+			default:
+				panic("OOPS! What can I do!");
+				//return_pc += 4;
+				break;
+		}	
 	}
 
 	return return_pc;

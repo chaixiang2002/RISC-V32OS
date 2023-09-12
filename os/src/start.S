@@ -32,12 +32,36 @@ _start:
     add sp,sp,t0    
                     # 1024*8 +1024 再加上0吗？？？？？？？？？？？？？？？？？？？？？？？？？？？？
     
-    # 在start_kernel结束时，schedule()将调用MRET进行切换
-    # 到第一个任务，所以我们在这里准备状态。
-    # 注意:默认mstatus为0
-    # 设置mstatus。MPP到3，所以在MRET之后我们仍然在Machine模式下运行。
-    # 设置mstatus。MPIE为1，因此MRET将启用中断。
-	li	t0, 3 << 11 | 1 << 7
+# ---
+# https://lore.kernel.org/qemu-devel/20201223192553.332508-1-atish.patra@wdc.com/
+# 对于qemu version >= 6.0，如果没有配置PMP enty，将引发异常。所以只要配置一个条目，它就允许所有的整体
+# 32位物理地址范围为R/W/X。
+# FIXME:我说这是一个临时的解决方案，因为我认为上面的补丁包含错误，我已经向qemu提出了新的问题，但直到现在还没有根因。详情请参阅
+# https://gitlab.com/qemu-project/qemu/-/issues/585或
+# https://gitee.com/unicornx/riscv-operating-system-mooc/issues/I441IC(中文)
+# 所以这只是一个临时的解决方案，直到现在，不阻止人们想要尝试新的qemu(>= 6.0)。
+	li      t0, 0xffffffff  # 写入立即数0xffffffff
+	csrw    pmpaddr0, t0    # pmpaddr0？？？？？？？
+	li      t0, 0xf
+	csrw    pmpcfg0, t0     # pmpcfg0？？？？？？？
+
+# 在start_kernel结束时，schedule()将调用MRET进行切换
+# 到第一个任务，所以我们在这里准备状态。
+# 注意:默认mstatus为0
+
+# 设置mstatus。MPP为0，因此我们将在MRET后以用户模式运行。
+# 无需设置mstatus。MPIE显式地转换为1，因为根据ISA
+# specification: m模式(高于u模式)的中断总是全局启用，而不管全局MIE位的设置。
+# 所以最后我们把t0重置为0。
+    li  t0,0    #
+
+
+    # # 在start_kernel结束时，schedule()将调用MRET进行切换
+    # # 到第一个任务，所以我们在这里准备状态。
+    # # 注意:默认mstatus为0
+    # # 设置mstatus。MPP到3，所以在MRET之后我们仍然在Machine模式下运行。
+    # # 设置mstatus。MPIE为1，因此MRET将启用中断。
+	# li	t0, 3 << 11 | 1 << 7    # 11是Machine级别
 	csrr	a1, mstatus
 	or	t0, t0, a1
 	csrw	mstatus, t0

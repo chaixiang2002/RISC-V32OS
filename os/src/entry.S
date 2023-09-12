@@ -117,6 +117,7 @@ trap_vector:
 	# 调用trap. C中的trap处理程序
 	csrr	a0,mepc
 	csrr	a1,mcause
+	csrr	a2, mscratch	# !!!!!!!!!! 多了上下文一个参数
 	call 	trap_handler	# 相对于 trap_handler(mempc,mcause)
 
 	# ------------------------------------------------------------
