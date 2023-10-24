@@ -102,4 +102,13 @@ extern void append_char(char c);
 extern void to_handle(int num);
 extern void to_go();
 
+// 单任务模式
+extern void set_single_task_mode(int on);
+
+
+//gui
+extern void welcome();
+extern void command_mode();
+extern void exit_gui();
+extern void clear_screen();
 #endif

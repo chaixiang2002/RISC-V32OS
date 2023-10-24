@@ -6,6 +6,11 @@ extern void schedule(void);
 
 static uint32_t _tick = 0;
 
+static int single_task_mode =0;//
+void set_single_task_mode(int on){// 确保在切换单任务模式时发生任务切换，
+	__sync_lock_test_and_set(&single_task_mode,on);
+}
+
 // 软件定时器
 #define MAX_TIMER 10
 static struct timer timer_list[MAX_TIMER];			// 定时器数组
@@ -117,16 +122,20 @@ static inline void timer_check()
 void timer_handler() 
 {
 	_tick++;
-	if(_tick%10==0){
-		printf("tick: %d\n", _tick);
-		// display_time();
-	}
+	// if(_tick%10==0){
+	// 	printf("tick: %d\n", _tick);
+	// 	// display_time();
+	// }
 
 	timer_check();
 
 	timer_load(TIMER_INTERVAL);
 
-	schedule();
+	// spin_lock();
+	if (single_task_mode==0) {// 单任务模式关闭，不停切换
+		schedule();
+	}
+	// spin_unlock();
 
 }
 

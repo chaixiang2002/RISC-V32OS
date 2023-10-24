@@ -24,7 +24,8 @@ SRCS_C = \
 	timer.c \
 	lock.c \
 	spinlock.c \
-	syscall.c
+	syscall.c	\
+	gui.c
 
 OBJS = $(SRCS_ASM:.S=.o)
 OBJS += $(SRCS_C:.c=.o)
