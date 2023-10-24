@@ -29,7 +29,51 @@ int strcmp(const char *str1, const char *str2) {
 void to_go(){
 	state=1;
 }
-void to_handle(int num){//0无命令 1判断执行  5 打印  6 时间  -1error 7开机界面 8关机界面 9清屏 10显示状态码 11 单任务模式开启 12 单任务模式关闭
+
+ 
+void parse_command(const char *command) {
+    char cmd[1024], arg[1024], rest[1024];
+    int i, j;
+
+    // 提取命令
+    for (i = 0; command[i] != ' ' && command[i] != '\0'; i++) {
+        cmd[i] = command[i];
+    }
+    cmd[i] = '\0';
+
+    // 跳过空格
+    while (command[i] == ' ') {
+        i++;
+    }
+
+    // 提取参数
+    if (command[i] == '-') {
+        i++;  // 跳过'-'
+        for (j = 0; command[i] != ' ' && command[i] != '\0'; i++, j++) {
+            arg[j] = command[i];
+        }
+        arg[j] = '\0';
+    } else {
+        arg[0] = '\0';  // 没有参数
+    }
+
+    // 跳过空格
+    while (command[i] == ' ') {
+        i++;
+    }
+
+    // 提取剩余部分
+    for (j = 0; command[i] != '\0'; i++, j++) {
+        rest[j] = command[i];
+    }
+    rest[j] = '\0';
+
+    printf("Command: %s\n", cmd);
+    printf("Argument: %s\n", arg);
+    printf("Rest: %s\n", rest);
+}
+
+void to_handle(int num){//0无命令 1判断执行  5 打印  6 时间  -1error 7开机界面 8关机界面 9清屏 10显示状态码 11 单任务模式开启 12 单任务模式关闭 13创建task0
 	if (strcmp(buf, "time")==0) {
 		// printf("yes\n");
 		state=6;
@@ -45,6 +89,8 @@ void to_handle(int num){//0无命令 1判断执行  5 打印  6 时间  -1error 
 		state=11;
 	}else if(strcmp(buf, "system single_task_mode off")==0){
 		state=12;
+	}else if(strcmp(buf, "create task0")==0){
+		state=13;
 	}else {
 		state=-1;
 	}
@@ -148,7 +194,7 @@ void user_main(void){
 			state=0;
 			break;
 		case 10://10显示状态码
-			printf("//0无命令 1判断执行  5 打印  6 时间  -1error 7开机界面 8关机界面 9清屏 10显示状态码\n");
+			printf("//0无命令 1判断执行  5 打印  6 时间  -1error 7开机界面 8关机界面 9清屏 10显示状态码 11 单任务模式开启 12 单任务模式关闭 13创建task0\n");
 			printf("状态码:%d",state);
 			clear_buf();
 			state=0;
@@ -162,6 +208,11 @@ void user_main(void){
 		case 12://11 单任务模式开启 12 单任务模式关闭
 			// spin_unlock();
 			set_single_task_mode(0);
+			clear_buf();
+			state=0;
+			break;
+		case 13://13创建task0
+			task_create(user_task0);
 			clear_buf();
 			state=0;
 			break;
