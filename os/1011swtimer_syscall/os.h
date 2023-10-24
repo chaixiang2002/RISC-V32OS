@@ -92,14 +92,6 @@ struct timer {
 };
 extern struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
 extern void timer_delete(struct timer *timer);
-extern void display_time();
 
-extern void setbuf(const char *str);
-extern const char* getbuf(void);
-extern int is_empty(void);
-extern void clear_buf(void);
-extern void append_char(char c);
-extern void to_handle(int num);
-extern void to_go();
 
 #endif

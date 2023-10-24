@@ -48,11 +48,11 @@ reg_t trap_handler(reg_t epc, reg_t cause,struct context *cxt)
 
 			break;
 		case 7:
-			// uart_puts("timer interruption!\n");
+			uart_puts("timer interruption!\n");
 			timer_handler();
 			break;
 		case 11:
-			// uart_puts("external interruption!\n");
+			uart_puts("external interruption!\n");
 			external_interrupt_handler();
 			break;
 		default:

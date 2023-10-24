@@ -117,10 +117,7 @@ static inline void timer_check()
 void timer_handler() 
 {
 	_tick++;
-	if(_tick%10==0){
-		printf("tick: %d\n", _tick);
-		// display_time();
-	}
+	printf("tick: %d\n", _tick);
 
 	timer_check();
 
@@ -128,23 +125,4 @@ void timer_handler()
 
 	schedule();
 
-}
-
-void display_time() {
-	unsigned int seconds=_tick;
-    unsigned int baseTime = 0; // 2023年10月10日0点0分0秒的时间戳
-    unsigned int eventTime = baseTime + seconds;
-    unsigned int years, months, days, hours, minutes, secs;
-
-    // 将总秒数转换为年、月、日、时、分、秒
-    secs = eventTime % 60;
-    minutes = (eventTime / 60) % 60;
-    hours = (eventTime / (60 * 60)) % 24;
-    days = (eventTime / (60 * 60 * 24)) % 30; // 假设一个月为30天
-    months = (eventTime / (60 * 60 * 24 * 30)) % 12;
-    years = (eventTime / (60 * 60 * 24 * 30 * 12));
-
-    // 输出日期和时间
-    printf("\rThe time is: %d-%d-%d %d:%d:%d\n", 
-        2023 + years, 10 + months, 10 + days, hours, minutes, secs);
 }

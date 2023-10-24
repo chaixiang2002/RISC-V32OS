@@ -1,41 +1,6 @@
 启动顺序
 start.S->mem.S->entry.S->usys.S
-
-- 内核
-kernel.c->
-
-- IO
-uart.c
-printf.c
-
-- 内存
-page.c
-
-- 调度
-sched.c
-user.c
-
-- 陷入和中断
-trap.c
-plic.c
-
-- 定时器
-timer.c
-
-- 锁
-lock.c
-spinlock.c
-
-- 系统调用
-syscall.c
-systask.c
-
-
-- 其他
-os.h
-os.ld
-platform.h
-riscv.h
+kernel.c->uart.c->printf.c->page.c->sched.c->user.c->trap.c->plic.c->timer.c->lock.c->syscall.c
 
 
 

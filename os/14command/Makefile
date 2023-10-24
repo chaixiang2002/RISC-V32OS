@@ -1,22 +1,30 @@
-CROSS_COMPILE = riscv64-unknown-elf-
-CFLAGS = -nostdlib -fno-builtin -march=rv32ima -mabi=ilp32 -g -Wall
- 
-QEMU = qemu-system-riscv32
-QFLAGS = -nographic -smp 1 -machine virt -bios none
+include ../../common.mk
 
-GDB = gdb-multiarch
-# GDB = ${CROSS_COMPILE}gdb
-# GDB = riscv64-unknown-elf-gdb
-CC = ${CROSS_COMPILE}gcc
-OBJCOPY = ${CROSS_COMPILE}objcopy
-OBJDUMP = ${CROSS_COMPILE}objdump
+SYSCALL = y
 
+ifeq (${SYSCALL}, y)
+CFLAGS += -D CONFIG_SYSCALL
+endif
 
 SRCS_ASM = \
 	start.S \
+	mem.S \
+	entry.S \
+	usys.S
 
 SRCS_C = \
 	kernel.c \
+	uart.c \
+	printf.c \
+	page.c \
+	sched.c \
+	user.c \
+	trap.c \
+	plic.c \
+	timer.c \
+	lock.c \
+	spinlock.c \
+	syscall.c
 
 OBJS = $(SRCS_ASM:.S=.o)
 OBJS += $(SRCS_C:.c=.o)
@@ -24,9 +32,9 @@ OBJS += $(SRCS_C:.c=.o)
 .DEFAULT_GOAL := all
 all: os.elf
 
-# start.o must be the first in dependency!			# kernel加载到 0x80000000
+# start.o must be the first in dependency!
 os.elf: ${OBJS}
-	${CC} ${CFLAGS} -Ttext=0x80000000 -o os.elf $^
+	${CC} ${CFLAGS} -T os.ld -o os.elf $^
 	${OBJCOPY} -O binary os.elf os.bin
 
 %.o : %.c

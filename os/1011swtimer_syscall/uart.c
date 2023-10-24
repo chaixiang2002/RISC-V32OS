@@ -140,73 +140,7 @@ int uart_getc(void)
 
 /*
     处理一个uart中断，因为输入已经接受而触发发，从trap.c调用。
-    用户每输入有一个字符，都触发这个中断
 */
-// void uart_isr(void)
-// {
-//     static int newLineFlag = 0; // 新增一个标志位，用于指示是否需要换行
-
-//     while (1) {
-//         int c = uart_getc();
-//         if (c == -1) {
-//             break;
-//         } else {
-//             uart_putc((char)c);
-//             if ((char)c == '\n') {
-//                 newLineFlag = 1; // 设置换行标志位为1
-//             }
-//         }
-
-//         if (newLineFlag) {
-//             uart_putc('\n'); // 在遇到换行符后执行换行操作
-//             newLineFlag = 0; // 将换行标志位重置为0
-//         }
-//     }
-// }
-
-extern void setbuf(const char *str);
-extern void append_char(char c);
-// void uart_isr(void)
-// {
-// 			uart_putc('1');
-
-//     char buf[1024];
-//     buf[0] = '\0';
-//     int i=0;
-// 			uart_putc('2');
-
-
-// 	while (1) {
-// 			uart_putc('-');
-
-// 		int c = uart_getc();
-// 		if (c == -1) {
-// 			uart_putc('5');
-
-// 			break;
-// 		} else {
-// 			uart_putc('3');
-
-//             buf[i++]=(char)c;
-// 			uart_putc((char)c);
-//             if ((char)c == '\r') {
-//                 // uart_putc('\n');
-//                 printf("\nRVSCV-OS: ");
-
-//                 buf[i++]='\0';
-//                 setbuf(buf);
-//                 buf[0] = '\0';
-//             }
-// 			uart_putc('4');
-
-// 		}
-// 	}
-// 			uart_putc('6');
-
-// }
-
-extern void to_handle(int num);
-extern void to_go();
 void uart_isr(void)
 {
 	while (1) {
@@ -215,19 +149,10 @@ void uart_isr(void)
 			break;
 		} else {
 			uart_putc((char)c);
-            if ((char)c == '\r') {
-                uart_putc('\n');
-                to_go();
-            }else {
-                append_char((char)c);
-            }
+			uart_putc('\n');
 		}
 	}
 }
-
-
-
-
 
 
 
