@@ -31,7 +31,7 @@ void to_go(){
 }
 
  
-void parse_command(const char *command) {
+int parse_command(const char *command) {
     char cmd[1024], arg[1024], rest[1024];
     int i, j;
 
@@ -68,9 +68,15 @@ void parse_command(const char *command) {
     }
     rest[j] = '\0';
 
-    printf("Command: %s\n", cmd);
-    printf("Argument: %s\n", arg);
-    printf("Rest: %s\n", rest);
+	if(strcmp(cmd, "print")==0){
+		printf("\n> %s",rest);
+		return 1;
+	}
+	return 0;
+	printf("------------------asdasdasd");
+    // printf("Command: %s\n", cmd);
+    // printf("Argument: %s\n", arg);
+    // printf("Rest: %s\n", rest);
 }
 
 void to_handle(int num){//0无命令 1判断执行  5 打印  6 时间  -1error 7开机界面 8关机界面 9清屏 10显示状态码 11 单任务模式开启 12 单任务模式关闭 13创建task0
@@ -91,11 +97,16 @@ void to_handle(int num){//0无命令 1判断执行  5 打印  6 时间  -1error 
 		state=12;
 	}else if(strcmp(buf, "create task0")==0){
 		state=13;
-	}else {
+	}
+	// else if(parse_command(buf)==1){
+	// 	state=0;
+	// 	clear_buf();
+	// }
+	else {
 		state=-1;
 	}
 
-	printf("%d\n",state);
+	// printf("%d\n",state);
 }
 
 
