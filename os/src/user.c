@@ -78,6 +78,15 @@ int parse_command(const char *command) {
     // printf("Argument: %s\n", arg);
     // printf("Rest: %s\n", rest);
 }
+void create_task_by_name(const char* function_name) {
+    if (strcmp(function_name, "user_task1") == 0) {
+        // 创建 user_task1 任务
+        // task_create(user_task1);
+        printf("Creating user_task1...\n");
+    }else {
+        printf("Function %s does not exist!\n", function_name);
+    }
+}
 
 void to_handle(int num){//0无命令 1判断执行  5 打印  6 时间  -1error 7开机界面 8关机界面 9清屏 10显示状态码 11 单任务模式开启 12 单任务模式关闭 13创建task0
 	if (strcmp(buf, "time")==0) {
@@ -97,6 +106,8 @@ void to_handle(int num){//0无命令 1判断执行  5 打印  6 时间  -1error 
 		state=12;
 	}else if(strcmp(buf, "create task0")==0){
 		state=13;
+	}else if(strcmp(buf, "create your_want_task")==0){
+		state=14;
 	}
 	// else if(parse_command(buf)==1){
 	// 	state=0;
@@ -167,6 +178,18 @@ void user_task0(void)
 	
 }
 
+void your_want_task(void){
+	printf("我的自定义任务: 开始运行了!\n");
+
+	int i=10;
+	while (i--) {
+		printf("我的自定义任务: 运行中 %d!\n",i);
+		task_delay(DELAY);// 暂停1秒
+	}
+
+	printf("我的自定义任务: 结束了!\n");
+
+}
 
 
 extern void welcome();
@@ -227,6 +250,11 @@ void user_main(void){
 			clear_buf();
 			state=0;
 			break;
+		case 14://13创建task0
+			task_create(your_want_task);
+			clear_buf();
+			state=0;
+			break;
 		case -1:
 			printf("%s is not recognized as an internal or external command,operable program or batch file.\n",buf);
 			clear_buf();
@@ -246,21 +274,22 @@ void user_main(void){
 }
 
 void user_task1(void){
-	uart_puts("Task 1: Created!\n");
+	printf("Task 1: Created!\n");
 
 	while (1) {
-		uart_puts("Task 1: Running... \n");
+		printf("Task 1: Running... \n");
 		task_delay(DELAY);
 	}
-
-
 }
+
+
 
 void os_main(void)
 {
 	task_create(user_main);
 	// task_create(user_task0);
-	task_create(user_task1);
+	// task_create(user_task1);
+	// task_create(your_want_task);// 如果想要开机自启，请在这里写
 
 }
 
