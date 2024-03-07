@@ -55,3 +55,7 @@ sudo qemu-system-riscv32 -nographic -smp 1 -machine virt -bios none -kernel os.e
 1. start.S   引入   platform.h 
 2. start.S   跳转到 kernel.c
 3. kernel.c  不停循环
+
+
+
+riscv64-unknown-elf-objdump -d  kernel.o > kernel.s
