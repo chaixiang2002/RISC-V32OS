@@ -52,7 +52,11 @@ debug: all
 code: all
 	@${OBJDUMP} -S os.elf | less
 
+.PHONY : obj
+obj: all
+	@${OBJDUMP} -d os.elf > os.s
+
 .PHONY : clean
 clean:
-	rm -rf *.o *.bin *.elf
+	rm -rf *.o *.bin *.elf *.s
 
