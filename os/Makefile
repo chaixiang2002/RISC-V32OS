@@ -7,10 +7,9 @@ SECTIONS = \
 	05-traps \
 	06-interrupts \
 	07-hwtimer \
-	# 08-preemptive \
-	# 09-lock \
-	# 10-swtimer \
-	# 11-syscall \
+	08-preemptive \
+	09-lock \
+	1011swtimer_syscall \
 
 .DEFAULT_GOAL := all
 all :
