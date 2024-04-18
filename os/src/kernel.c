@@ -25,7 +25,7 @@ void start_kernel(void)
 
     sched_init();// 任务调度初始化
 
-    os_main();//     user的任务创建
+    os_main();//     user的任务创建(启动用户定义的任务)
 
     schedule();//     任务切换
     printf("hello,i am chaixiang!");

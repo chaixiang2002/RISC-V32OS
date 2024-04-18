@@ -9,7 +9,9 @@ endif
 SRCS_ASM = \
 	start.S \
 	mem.S \
-	entry.S \
+	reg_macro.S \
+	switch.S \
+	trapvec.S \
 	usys.S
 
 SRCS_C = \
