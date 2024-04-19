@@ -14,7 +14,7 @@ void trap_init()
 
 void external_interrupt_handler()
 {
-	int irq = plic_claim();
+	int irq = plic_claim();//读取哪个设备的中断
 
 	if (irq == UART0_IRQ){
       		uart_isr();

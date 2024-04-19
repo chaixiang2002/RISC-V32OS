@@ -53,7 +53,7 @@ _start:
 # 无需设置mstatus。MPIE显式地转换为1，因为根据ISA
 # specification: m模式(高于u模式)的中断总是全局启用，而不管全局MIE位的设置。
 # 所以最后我们把t0重置为0。
-    li  t0,0    #
+    # li  t0,0    #
 
 
     # # 在start_kernel结束时，schedule()将调用MRET进行切换
@@ -61,14 +61,18 @@ _start:
     # # 注意:默认mstatus为0
     # # 设置mstatus。MPP到3，所以在MRET之后我们仍然在Machine模式下运行。
     # # 设置mstatus。MPIE为1，因此MRET将启用中断。
+
 	# li	t0, 3 << 11 | 1 << 7    # 11是Machine级别
-	csrr	a1, mstatus
-	or	t0, t0, a1
-	csrw	mstatus, t0
+	# csrr	a1, mstatus
+
+    # Set mstatus.MPP as 0, so we will run in User mode after MRET.
+	# No need to set mstatus.MPIE to 1 explicitly, because according to ISA
+	# specification: interrupts for M-mode, which is higher than U-mode, are
+	# always globally enabled regardless of the setting of the global MIE bit.
+    li	t0, 3 << 11
+	csrc	mstatus, t0
     
     j   start_kernel
-
-
 
 # 本系统暂时只运行在一个hart上，其他的hart 不断休眠
 park:

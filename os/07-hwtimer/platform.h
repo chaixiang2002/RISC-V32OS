@@ -34,12 +34,15 @@
 */
 
 #define PLIC_BASE 0x0c000000L
-#define PLIC_PRIORITY(id) (PLIC_BASE + (id) * 4)
-#define PLIC_PENDING(id) (PLIC_BASE + 0x1000 + ((id) / 32) * 4)
-#define PLIC_MENABLE(hart) (PLIC_BASE + 0x2000 + (hart) * 0x80)
-#define PLIC_MTHRESHOLD(hart) (PLIC_BASE + 0x200000 + (hart) * 0x1000)
-#define PLIC_MCLAIM(hart) (PLIC_BASE + 0x200004 + (hart) * 0x1000)
+#define PLIC_PRIORITY(id) (PLIC_BASE + (id) * 4)  //设置某一路中断源的优先级。
+#define PLIC_PENDING(id) (PLIC_BASE + 0x1000 + ((id) / 32) * 4) //用于指示某一路中断源是否发生， 1 表示发生了中断，可以通过 claim 方式清除
+#define PLIC_MENABLE(hart) (PLIC_BASE + 0x2000 + (hart) * 0x80) // 针对某个 hart 开启或者关闭某一路中断源， 1 表示使用能该中断源
+#define PLIC_MTHRESHOLD(hart) (PLIC_BASE + 0x200000 + (hart) * 0x1000) //针对某个 hart 设置中断源优先级的阈值。0允许所有，7丢弃所有中断
+#define PLIC_MCLAIM(hart) (PLIC_BASE + 0x200004 + (hart) * 0x1000)  
 #define PLIC_MCOMPLETE(hart) (PLIC_BASE + 0x200004 + (hart) * 0x1000)
+//Claim 和 Complete 是同一个寄存器，每个 Hart 一个。
+//对该寄存器执行读操作称之为 Claim，即获取当前发生的最高优先级的中断源 ID。Claim 成功后会清除对应的 Pending 位。
+//对该寄存器执行写操作称之为 Complete。所谓 Complete 指的是通知 PLIC 对该路中断的处理已经结束。
 
 /*
 核心本地中断器(CLINT)块保存内存映射控制和
@@ -68,11 +71,10 @@
 *复位时，每个msip寄存器被清除为零。
 */
 #define CLINT_BASE 0x2000000L
-#define CLINT_MSIP(hartid) (CLINT_BASE + 4 * (hartid))
-#define CLINT_MTIMECMP(hartid) (CLINT_BASE + 0x4000 + 8 * (hartid))
-#define CLINT_MTIME (CLINT_BASE + 0xBFF8) 
-
+#define CLINT_MSIP(hartid) (CLINT_BASE + 4 * (hartid)) //每个处理器核心的软件中断控制寄存器（MSIP寄存器）。1是中断，0是解决了
+#define CLINT_MTIMECMP(hartid) (CLINT_BASE + 0x4000 + 8 * (hartid)) //比较计数器
+#define CLINT_MTIME (CLINT_BASE + 0xBFF8)   //计数器
 /* 10000000次/秒 */
-#define CLINT_TIMEBASE_FREQ 10000000
+#define CLINT_TIMEBASE_FREQ 10000000 //定时间隔
 
 #endif 
